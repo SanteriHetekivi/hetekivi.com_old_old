@@ -6,7 +6,7 @@ class SQLClass
 	protected $_new = false;
 	protected $_userLink = false;
 
-	public function __construct($_values, $_pass_to_intiliazing=FALSE)
+	public function __construct($_values=FALSE, $_pass_to_intiliazing=FALSE)
 	{
 		$this->initializeValues($_pass_to_intiliazing);
 		if(isset($_values) && $_values)
@@ -54,6 +54,15 @@ class SQLClass
 		return TRUE;
 	}
 
+	public function getColumnNames()
+	{
+		$columns = array();
+		foreach ($this->_columns as $column => $value) {
+			$columns[$column] = $column;
+		}
+		return $columns;
+	}
+
 	public function getTable(){ return $this->_table; }
 
 
@@ -75,6 +84,11 @@ class SQLClass
 	public function getLinkedValue($_column)
 	{
 		return ($this->_userLink && $this->_userLink->_columns[$_column])?$this->_userLink->_columns[$_column]->getValue():FALSE;
+	}
+
+	public function getUserLink()
+	{
+		return $this->_userLink;
 	}
 
 	public function getID() { return $this->getValue("id"); }
@@ -123,7 +137,7 @@ class SQLClass
 
 	private function CHECK()
 	{
-		foreach($this->_columns as $_column)
+		foreach($this->_columns as $key => $_column)
 		{
 			if(!$_column->check()) return FALSE;
 		}
@@ -162,7 +176,10 @@ class SQLClass
 		if(SQL_DELETE_ID($_table=$this->getTable(), $_id=$this->getValue("id")))
 		{
 			$userLinks = $this->getAllLinks();
-			foreach($userLinks as $userLink) $userLink->REMOVE();
+			if(is_array($userLinks))
+			{
+				foreach($userLinks as $userLink) $userLink->REMOVE();
+			}
 			return $this->AfterREMOVE();
 		}else return FALSE;
 	}

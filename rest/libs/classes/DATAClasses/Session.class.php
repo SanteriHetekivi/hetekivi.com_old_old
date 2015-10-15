@@ -4,10 +4,17 @@ class Session
 	public $user = false;
 	public $lockedIn = false;
 	public $tables = array();
-
+	public $data = array();
 	function __construct()
 	{
-		$lockedIn = false;
+		$this->clean();
+	}
+
+	function clean()
+	{
+		$this->user = false;
+		$this->lockedIn = false;
+		$this->tables = array();
 	}
 
 	function Login($_usename,$_password)
@@ -28,8 +35,7 @@ class Session
 
 	function Logout()
 	{
-		$this->lockedIn = false;
-		$this->user = NULL;
+		$this->clean();
 		$this->pages = array("HOME"=>"home","LOGIN"=>"login");
 		return true;
 	}
@@ -72,6 +78,31 @@ class Session
 		return $pages;
 	}
 
+	function getUserID()
+	{
+		if(is_object($this->user))
+		{
+			return $this->user->getID();
+		}else return false;
+	}
+
+	function setData($name, $data)
+	{
+		$userid = $this->getUserID();
+		if($userid && isset($name) && isset($data))
+		{
+			$this->data[$userid][$name] = $data;
+			return true;
+		}else return false;
+	}
+	function getData($name)
+	{
+		$userid = $this->getUserID();
+		if(isset($name) && isset($this->data[$userid][$name]))
+		{
+			return $this->data[$userid][$name];
+		}else return false;
+	}
 	function checkPage($_page){ return in_array($_page,$this->getPages()); }
 }
 ?>

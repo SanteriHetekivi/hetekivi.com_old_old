@@ -9,7 +9,7 @@ class UserLink extends SQLClass
 		4 => "Dropped",
 		6 => "Plan to Read"
 	);
-	
+
 	private $anime_statuses = array(
 		0 => "ERROR!",
 		1 => "Watching",
@@ -18,9 +18,9 @@ class UserLink extends SQLClass
 		4 => "Dropped",
 		6 => "Plan to Watch"
 	);
-	
+
 	private $oldGiftPosition = FALSE;
-	
+
 	protected function initializeValues($_pass_to_intiliazing=FALSE)
 	{
 		$this->addColumn($_name="id");
@@ -38,7 +38,7 @@ class UserLink extends SQLClass
 		$this->addColumn($_name="gift_mother_id", $type="id_empty");
 		$this->_table = "users_links";
 	}
-	
+
 	public function getStatus()
 	{
 		$status = $this->getValue("manga_anime_status");
@@ -49,13 +49,13 @@ class UserLink extends SQLClass
 		}else $status = "ERROR!";
 		return $status;
 	}
-	
+
 	protected function AfterCONSTRUCT()
 	{
 		$this->oldGiftPosition = $this->getValue("gift_position");
 		return true;
 	}
-	
+
 	protected function AfterCOMMIT()
 	{
 		if($this->getValue("gifts_id"))
@@ -70,8 +70,9 @@ class UserLink extends SQLClass
 				//debug($oldPosition);
 			}
 		}
+		return TRUE;
 	}
-	
+
 	protected function AfterREMOVE()
 	{
 		if($this->getValue("gifts_id"))
@@ -79,7 +80,24 @@ class UserLink extends SQLClass
 			return SQL_SEND_QUERY($_query="UPDATE ".$this->getTable()." SET gift_position = gift_position - 1 WHERE gift_position > '".$this->getValue("gift_position").
 			"' AND users_id = '".$this->getValue("users_id")."'");
 		}
-		
+		return TRUE;
+	}
+
+	public function getParentClass()
+	{
+		if($this->getValue("gifts_id"))
+		{
+			return new Gift($this->getValue("gifts_id"));
+		}
+		elseif($this->getValue("mangas_id"))
+		{
+			return new Manga($this->getValue("mangas_id"));
+		}
+		elseif($this->getValue("animes_id"))
+		{
+			return new Anime($this->getValue("animes_id"));
+		}
+		else return FALSE;
 	}
 }
 ?>

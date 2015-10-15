@@ -72,4 +72,60 @@
 		}else return FALSE;
 		return $objects;
 	}
+  function malStatus($id, $mal_or_user="user", $manga_or_anime="manga")
+  {
+    if(isset($id))
+    {
+      $statuses = array();
+      if($mal_or_user == "mal") $statuses = array(
+    		0 => "ERROR!",
+    		1 => "Ongoing",
+    		2 => "Finished",
+    	);
+      elseif($manga_or_anime == "manga") $statuses = array(
+        0 => "ERROR!",
+        1 => "Reading",
+        2 => "Completed",
+        3 => "On Hold",
+        4 => "Dropped",
+        6 => "Plan to Read"
+      );
+      elseif($manga_or_anime == "anime") $statuses = array(
+        0 => "ERROR!",
+        1 => "Watching",
+        2 => "Completed",
+        3 => "On Hold",
+        4 => "Dropped",
+        6 => "Plan to Watch"
+      );
+      if(isset($statuses[$id])) return $statuses[$id];
+      else return $statuses;
+    }
+    return false;
+  }
+  function getSessionData($name=false)
+  {
+    $session=$_SESSION["session"];
+    return (is_object($session))?$session->getData($name):FALSE;
+  }
+  function setSessionData($name, $data)
+  {
+    $session=&$_SESSION["session"];
+    return (is_object($session))?$session->setData($name, $data):FALSE;
+  }
+  function getMangaImage($_link,$_mangaPage)
+	{
+		$imageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png";
+		if($_mangaPage=="Batoto") $query = "//img[starts-with(@src,'http://img.bato.to/forums/uploads/7')]";
+		elseif($_mangaPage=="MangaFox")$query ="//img[starts-with(@src,'http://a.mfcdn.net/store/manga')]";
+		else return $imageUrl;
+
+		libxml_use_internal_errors(true);
+		$mangaPage = new DOMDocument();
+		$mangaPage->loadHTMLFile($_link);
+		$xpath = new DOMXPath($mangaPage);
+		$image = $xpath->query($query);
+		$imageUrl = $image->item(0)->getAttribute('src');
+    return $imageUrl;
+	}
 ?>

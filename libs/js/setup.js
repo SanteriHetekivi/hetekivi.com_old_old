@@ -1,4 +1,7 @@
 $(document).ready(function(){
+  $.get("rest/index.php/error",  function(error) { if(error)showAlert("error",error,5); });
+  $.get("rest/index.php/message",  function(message) { if(message)showAlert("message",message,5); });
+
   $.getJSON("rest/index.php/login",  function(login)
   {
     if(login == true)
@@ -10,7 +13,7 @@ $(document).ready(function(){
     }
     else
     {
-      $("#login").load("login.html");
+      $("#login").load("libs/html/popup/login.html");
       $("#navLogin").attr("href","");
       $("#navLogin").attr("data-toggle","modal");
       $("#navLogin").attr("data-target","#ModalLogin");

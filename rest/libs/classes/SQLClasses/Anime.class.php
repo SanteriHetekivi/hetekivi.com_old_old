@@ -1,23 +1,15 @@
 <?php
 class Anime extends SQLClass
 {
-	
+
 	private $statuses = array(
 		0 => "ERROR!",
-		1 => "",
-		2 => "",
-		3 => "",
-		4 => "",
-		5 => "",
-		6 => "",
-		7 => "",
-		8 => "",
-		9 => "",
-		10 => ""
+		1 => "Ongoing",
+		2 => "Finished",
 	);
-	
+
 	protected $_altTitles = array();
-	
+
 	protected function initializeValues($_pass_to_intiliazing=FALSE)
 	{
 		$this->addColumn($_name="id");
@@ -29,28 +21,28 @@ class Anime extends SQLClass
 		$this->_table = "animes";
 		return TRUE;
 	}
-	
+
 	protected function Before_COMMIT()
 	{
 		$this->addAltTitles();
 	}
-	
+
 	public function setAltTitles($altTitles)
 	{
 		if(is_array($altTitles)) $this->_altTitles=$altTitles;
 	}
-	
+
 	public function getStatus($_source)
 	{
 		if($_source == "user" && $this->_userLink) return $this->_userLink->getStatus();
 		else return $this->statuses[$this->getValue("status")];
 	}
-	
+
 	public function getAltTitles()
 	{
 		return $this->_altTitles;
 	}
-	
+
 	private function addAltTitles()
 	{
 		$altTitles = $this->getAltTitles();

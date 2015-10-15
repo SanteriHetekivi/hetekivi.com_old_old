@@ -1,4 +1,7 @@
 <?php
+
+  set_time_limit(60*5); //5min
+
   setlocale(LC_MONETARY,"fi_FI");
   require_once("conf.php");
   require_once(LIBS_PATH."mysql.php");
@@ -12,8 +15,15 @@
 
   function ERROR($text = FALSE)
   {
+    setSessionData("error", $text);
     $location = (!empty($_SERVER["HTTP_REFERER"]))?$_SERVER["HTTP_REFERER"]:ADDRESS."index.html";
-    $location .= "?error=".$text;
+    header("Location: ".$location);
+    die("Redirecting to: ".$location);
+  }
+  function MESSAGE($text = FALSE)
+  {
+    setSessionData("message", $text);
+    $location = (!empty($_SERVER["HTTP_REFERER"]))?$_SERVER["HTTP_REFERER"]:ADDRESS."index.html";
     header("Location: ".$location);
     die("Redirecting to: ".$location);
   }
@@ -50,8 +60,6 @@
         ERROR("Running function ".$function." with variables ".json_encode($variables)." failed");
       }
     }else ERROR("Not logged in!");
-
-
   }
   else ERROR("No PATH_INFO or REQUEST_METHOD");
   exit();

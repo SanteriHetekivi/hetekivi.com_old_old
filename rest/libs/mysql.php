@@ -173,12 +173,13 @@
 			$offset = ($_offset)?"OFFSET ".SQL_CLEAN_VALUE($conn, $_offset)." ":"";
 
 			$query = $columns.$table.$join.$where.$order.$limit.$offset;
+			//die($query);
 			//debug($query);
 			$result = SQL_QUERY($conn, $query);
 			$conn->close();
 			if($result)
 			{
-				if($result->num_rows <= 0) return "EMPTY!";
+				if($result->num_rows <= 0) return array();
 			}else return FALSE;
 		}else return FALSE;
 
@@ -313,7 +314,7 @@
 			if($_where) $query .= " WHERE " . $_where;
 			$result = SQL_QUERY($conn, $query);
 			$conn->close();
-			if ($result->num_rows > 0)
+			if (is_object($result) && $result->num_rows > 0)
 			{
 				while($row = $result->fetch_assoc())
 				{
@@ -394,17 +395,18 @@
 		}else return FALSE;
 	}
 
-	function SQL_COUNT_ROWS($_table, $_where)
+	function SQL_COUNT_ROWS($_table, $_where, $_joinTable = false, $_joinTableId= false)
 	{
 		if(isset($_table) && isset($_where))
 		{
 			$conn=SQL_CONNECT();
-			$query = "SELECT COUNT(id) FROM " . SQL_CLEAN_VALUE($conn, $_table) . " WHERE " . $_where;
+			$join = ($_joinTable && $_joinTableId)?" INNER JOIN ".SQL_CLEAN_VALUE($conn, $_joinTable)." ON ".$_table.".id=".SQL_CLEAN_VALUE($conn, $_joinTable).".".SQL_CLEAN_VALUE($conn, $_joinTableId):"";
+			$query = "SELECT COUNT(".$_table.".id) FROM " . SQL_CLEAN_VALUE($conn, $_table) . $join . " WHERE " . $_where;
 			$result = SQL_QUERY($conn, $query);
 			$conn->close();
 			if ($result->num_rows <= 0) return FALSE;
 		}else return FALSE;
-		$count = $result->fetch_assoc()["COUNT(id)"];
+		$count = $result->fetch_assoc()["COUNT(".$_table.".id)"];
 		return is_numeric($count)?$count:FALSE;
 	}
 ?>

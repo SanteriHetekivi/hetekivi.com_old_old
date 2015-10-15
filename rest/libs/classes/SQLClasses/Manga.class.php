@@ -4,18 +4,10 @@ class Manga extends SQLClass
 	protected $_altTitles = array();
 	private $statuses = array(
 		0 => "ERROR!",
-		1 => "",
-		2 => "",
-		3 => "",
-		4 => "",
-		5 => "",
-		6 => "",
-		7 => "",
-		8 => "",
-		9 => "",
-		10 => ""
+		1 => "Ongoing",
+		2 => "Finished",
 	);
-	
+
 	protected function initializeValues($_pass_to_intiliazing=FALSE)
 	{
 		$this->addColumn($_name="id");
@@ -27,28 +19,28 @@ class Manga extends SQLClass
 		$this->_table = "mangas";
 		return TRUE;
 	}
-	
+
 	protected function Before_COMMIT()
 	{
 		$this->addAltTitles();
 	}
-	
+
 	public function setAltTitles($altTitles)
 	{
 		if(is_array($altTitles)) $this->_altTitles=$altTitles;
 	}
-	
+
 	public function getAltTitles()
 	{
 		return $this->_altTitles;
 	}
-	
+
 	public function getStatus($_source)
 	{
 		if($_source == "user" && $this->_userLink) return $this->_userLink->getStatus();
 		else return $this->statuses[$this->getValue("status")];
 	}
-	
+
 	private function addAltTitles()
 	{
 		$altTitles = $this->getAltTitles();
