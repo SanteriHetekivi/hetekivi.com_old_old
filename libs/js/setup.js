@@ -1,6 +1,6 @@
 $(document).ready(function(){
-  $.get("rest/index.php/error",  function(error) { if(error)showAlert("error",error,5); });
-  $.get("rest/index.php/message",  function(message) { if(message)showAlert("message",message,5); });
+//  $.get("rest/index.php/error",  function(error) { if(error)showAlert("error",error,5); });
+  //$.get("rest/index.php/message",  function(message) { if(message)showAlert("message",message,5); });
 
   $.getJSON("rest/index.php/login",  function(login)
   {

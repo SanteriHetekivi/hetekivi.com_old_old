@@ -147,7 +147,8 @@
 		}else return FALSE;
 	}
 
-	function SQL_SELECT($_columns = FALSE,
+	function SQL_SELECT(
+		$_columns = FALSE,
 		$_table,
 		$_joinTable = FALSE,
 		$_joinTableId = FALSE,
@@ -156,13 +157,15 @@
 		$_offset = FALSE,
 		$_limit = FALSE,
 		$_object = FALSE,
-		$_onlyFirstRow = FALSE)
+		$_onlyFirstRow = FALSE,
+		$_noIDKeys = FALSE)
 	{
 		if(isset($_table))
 		{
 			$conn=SQL_CONNECT();
 			$tab = SQL_CLEAN_VALUE($conn, $_table);
-			$columns = "SELECT ".(($_object)?$tab.".id ":(($_columns)?$tab.".id, ".SQL_CLEAN_VALUE($conn, $_columns)." ":"* "));
+			if($_columns == "id") $columns =  "SELECT ".$tab.".id ";
+			else $columns = "SELECT ".(($_object)?$tab.".id ":(($_columns)?$tab.".id, ".SQL_CLEAN_VALUE($conn, $_columns)." ":"* "));
 			$table = "FROM ".$tab." ";
 			$join = ($_joinTable && $_joinTableId)?"INNER JOIN ".SQL_CLEAN_VALUE($conn, $_joinTable)." ON ".$tab.".id=".SQL_CLEAN_VALUE($conn, $_joinTable).".".SQL_CLEAN_VALUE($conn, $_joinTableId)." ":"";
 			$where = "";
@@ -182,7 +185,6 @@
 			$offset = ($_offset)?"OFFSET ".SQL_CLEAN_VALUE($conn, $_offset)." ":"";
 
 			$query = $columns.$table.$join.$where.$order.$limit.$offset;
-			//die($query);
 			//debug($query);
 			$result = SQL_QUERY($conn, $query);
 			$conn->close();
@@ -229,8 +231,19 @@
 			while($row = $result->fetch_assoc())
 			{
 				$id = $row["id"];
-				if($all) $return[$id] = $row;
+				if($all && $_noIDKeys) $return[] = $row;
+				elseif($all) $return[$id] = $row;
+				elseif($onlyOneColumn && $_noIDKeys) $return[] = $row[$onlyOneColumn];
 				elseif($onlyOneColumn) $return[$id] = $row[$onlyOneColumn];
+				elseif($_noIDKeys)
+				{
+					$columns = array();
+					foreach($_columns as $column)
+					{
+						$columns[$column] = $row[$column];
+					}
+					$return[$columns];
+				}
 				else foreach($_columns as $column) $return[$id][$column] = $row[$column];
 			}
 		}
